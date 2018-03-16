@@ -1,0 +1,20 @@
+<%- include('header') %>
+<div class="">
+  <h1>作者：<%= app.author %></h1>
+  <% if (app.session.userInfo) { %>
+  <div class="">
+    你好，<b><%= app.session.userInfo.username %></b>
+    用户信息：<%- JSON.stringify(app.session.userInfo) %>
+    <img src="<%= app.session.userInfo.avatar %>" alt="">
+    <p>
+      <a href="/signin/logout">注销</a>
+    </p>
+  </div>
+  <% } else {%>
+  <div class="">
+    <a href="/signin">登录</a>
+    <a href="/signup">注册</a>
+  </div>
+  <% } %>
+</div>
+<%- include('footer') %>
