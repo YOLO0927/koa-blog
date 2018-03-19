@@ -76,3 +76,14 @@ a:hover {
 .post-content .tag.right a {
     color: #999;
 }
+.form .img-box{
+  width: 25%;
+  margin: 5px 0;
+}
+.img-box > img.preview{
+  width: 100%;
+  display: none;
+}
+.ui.pointing.red.basic.label{
+  display: none;
+}

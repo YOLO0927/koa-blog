@@ -1,4 +1,5 @@
 var path = require('path')
+var fs = require('fs')
 var Router = require('koa-router')
 var userModel = require('../model/users.js')
 var md5 = require('md5')
@@ -11,7 +12,6 @@ var router = new Router({
 
 router
   .get('/', async ctx => {
-    console.log(ctx.session)
     ctx.state.app.status = ctx.session.status
     ctx.state.app.msg = ctx.session.msg
     return ctx.render('signup')
@@ -34,44 +34,98 @@ router
       }
 
     } catch (e) {
-      ctx.session.status = 2
-      ctx.session.msg = e.message
-      ctx.redirect('/signup')
+      ctx.body = {
+        code: -1,
+        data: {},
+        msg: e.message
+      }
     }
     await userModel.findUserByName(ctx.request.body.username).then(async data => {
       // 检测用户名是否存在
       if (data.length) {
-        ctx.session.status = 2
-        ctx.session.msg = '用户名已存在'
-        ctx.redirect('/signup')
+        ctx.body = {
+          code: -1,
+          data: {},
+          msg: '用户名已存在'
+        }
       } else {
+        let base64Data = ctx.request.body.avatar.replace(/^data:image\/\w+;base64,/, "");
+        let dataBuffer = new Buffer(base64Data, 'base64')
+        let avatarName = `${moment().format('YYYY-MM-DD-HH-mm-ss-SS')}.png`
+        let uploadAvatar = await new Promise((resolve, reject) => {
+          fs.writeFile(path.join(__dirname, `../static/img/${avatarName}`), dataBuffer, err => {
+            if (err) {
+              throw new Error(err);
+              reject(false)
+            }
+            resolve(true)
+          })
+        })
+        if (!uploadAvatar) {
+          ctx.body = {
+            code: -1,
+            data: {},
+            msg: '头像上传失败'
+          }
+          return 0
+        }
         // 添加用户信息
-        let avatar = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1520854076839&di=15bd322420b8c4b16d39782425b42d89&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01786557e4a6fa0000018c1bf080ca.png'
         let isSuccess = await userModel.addUser([
           `native${(new Date()).getTime()}`,
           ctx.request.body.username,
           md5(ctx.request.body.password),
           parseInt(ctx.request.body.gender),
-          avatar,
+          `avatarName`,
           ctx.request.body.sign,
           'native',
           moment().format('YYYY-MM-DD HH:mm:ss'),
           moment().format('YYYY-MM-DD HH:mm:ss')
         ]).then(result => {
-          ctx.session.userInfo = ctx.request.body
+          delete ctx.request.body.password
           return true
         }).catch(err => {
           log.error('插入用户失败', JSON.stringify(err))
           return false
         })
         if(isSuccess) {
-          ctx.session.status = 1
-          ctx.session.msg = '注册成功'
-          ctx.response.redirect('/')
+          ctx.session.status = 0
+          ctx.session.msg = ''
+          ctx.session.userInfo = {
+            username: ctx.request.body.username,
+            avatar: `/img/${avatarName}`
+          }
+          ctx.body = {
+            code: 1,
+            data: ctx.session.userInfo,
+            msg: '注册成功'
+          }
         } else {
-          ctx.session.status = 2
-          ctx.session.errorMsg = '服务器错误，请重试'
-          ctx.redirect('/signup')
+          ctx.body = {
+            code: -1,
+            data: {},
+            msg: '注册用户失败'
+          }
+        }
+      }
+    }).catch((err) => {
+      log.error('查询用户信息错误', JSON.stringify(err))
+    })
+  })
+  .post('/findUser', async ctx => {
+    await userModel.findUserByName(ctx.request.body.username).then(async data => {
+      // 检测用户名是否存在
+      if (data.length) {
+        ctx.body = {
+          code: 1,
+          data: {},
+          msg: '用户名已存在'
+        }
+      } else {
+        // 添加用户信息
+        ctx.body = {
+          code: -1,
+          data: {},
+          msg: '用户名不存在'
         }
       }
     }).catch((err) => {
