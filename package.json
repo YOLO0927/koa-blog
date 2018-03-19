@@ -1,5 +1,5 @@
 {
-  "name": "node_modules_study",
+  "name": "blog",
   "version": "1.0.0",
   "description": "understanding the node modules and read source code for study node",
   "main": "index.js",
@@ -16,8 +16,9 @@
     "md5": "^2.2.1",
     "moment": "^2.21.0",
     "mysql": "^2.15.0",
+    "querystring": "^0.2.0",
     "read-metadata": "^1.0.0",
-    "request": "^2.83.0"
+    "request": "^2.85.0"
   },
   "devDependencies": {
     "ejs": "^2.5.7",

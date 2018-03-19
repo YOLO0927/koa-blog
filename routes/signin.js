@@ -2,6 +2,9 @@ var path = require('path')
 var Router = require('koa-router')
 var userModel = require('../model/users.js')
 var md5 = require('md5')
+var moment = require('moment')
+var config = require('../config/default.js')
+var github_signin = require('../public/github_login.js')
 var log = new require('../public/log.js')()
 
 var router = new Router({
@@ -32,6 +35,61 @@ router
         ctx.response.redirect('/signin')
       }
     })
+  })
+  .get('/github', async ctx => {
+    ctx.response.redirect(`https://github.com/login/oauth/authorize?client_id=${config.GITHUB_ID}`)
+  })
+  .get('/github/oauth', async ctx => {
+    let userInfo = await github_signin(ctx.request.query.code, config.GITHUB_ID, config.GITHUB_SECRET).then(userInfo => {
+      return userInfo
+    }).catch(err => {
+      log.error('获取 github 用户信息失败', JSON.stringify(err))
+    })
+    if (userInfo) {
+      // 获取授权信息后，先查询用户在用户表中是否存在，存在则更新表数据并直接返回，否则返回前先将用户入库
+      let ouathUser = await userModel.findUserBySourceId(userInfo.id).then((data) => {
+        return data
+      })
+
+      if (ouathUser.length) {
+        ctx.session.userInfo = ouathUser[0]
+        ctx.session.msg = `登录成功，欢迎您${ouathUser[0]['username']}`
+        ctx.session.status = 1
+      } else {
+        let githubToTable =  await userModel.addUser([
+          userInfo.id,
+          userInfo.login,
+          null,
+          null,
+          userInfo.avatar_url,
+          null,
+          'github',
+          moment().format('YYYY-MM-DD HH:mm:ss'),
+          moment().format('YYYY-MM-DD HH:mm:ss')
+        ]).then((result) => {
+          ctx.session.userInfo = {
+            username: userInfo.login,
+            avatar: userInfo.avatar_url
+          }
+          return true
+        }).catch(err => {
+          log.error('插入用户失败', JSON.stringify(err))
+          ctx.session.errorMsg = `授权失败，请尝试注册用户，原因：${JSON.stringify(err)}`
+          return false
+        })
+        if (githubToTable) {
+          ctx.session.status = 1
+          ctx.session.msg = '授权成功'
+          ctx.response.redirect('/')
+        } else {
+          ctx.session.status = 2
+          ctx.redirect('/signup')
+        }
+      }
+    } else {
+      ctx.session.status = 2
+      ctx.session.msg = '获取 github 用户授权失败'
+    }
   })
   .get('/logout', async ctx => {
     ctx.session.status = 1

@@ -48,11 +48,13 @@ router
         // 添加用户信息
         let avatar = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1520854076839&di=15bd322420b8c4b16d39782425b42d89&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01786557e4a6fa0000018c1bf080ca.png'
         let isSuccess = await userModel.addUser([
+          `native${(new Date()).getTime()}`,
           ctx.request.body.username,
           md5(ctx.request.body.password),
           parseInt(ctx.request.body.gender),
           avatar,
           ctx.request.body.sign,
+          'native',
           moment().format('YYYY-MM-DD HH:mm:ss'),
           moment().format('YYYY-MM-DD HH:mm:ss')
         ]).then(result => {
