@@ -13,7 +13,7 @@
 ##### 有删除线代表有设计但未完成的功能，后续仍有可能迭代新功能
 1.  用户模块
   - 用户登录
-  - 注册用户
+  - 注册用户(后续会将用户头像存入七牛云)
   - 注销用户
   - github第三方用户接入(此功能需要添加 ./config/default.js 下的 github app's client id 与 client secret,，不会的朋友可以查看我这篇博客 [如何进行 github 第三方用户授权](http://blog.csdn.net/yolo0927/article/details/79315824) 文章学习，若不需要该功能，请删除对应业务代码)
   - ~~用户信息更新~~
