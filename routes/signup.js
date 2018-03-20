@@ -29,7 +29,7 @@ router
         throw new Error('两次密码输入不一致')
       }
 
-      if (['1', '2', '3'].indexOf(ctx.request.body.gender)) {
+      if ((['1', '2', '3'].indexOf(ctx.request.body.gender)) !== -1) {
         throw new Error('请选择正确的性别')
       }
 
@@ -69,13 +69,15 @@ router
           }
           return 0
         }
+
         // 添加用户信息
+        let nativeId = `native${(new Date()).getTime()}`
         let isSuccess = await userModel.addUser([
-          `native${(new Date()).getTime()}`,
+          nativeId,
           ctx.request.body.username,
           md5(ctx.request.body.password),
           parseInt(ctx.request.body.gender),
-          `avatarName`,
+          `${avatarName}`,
           ctx.request.body.sign,
           'native',
           moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -92,7 +94,9 @@ router
           ctx.session.msg = ''
           ctx.session.userInfo = {
             username: ctx.request.body.username,
-            avatar: `/img/${avatarName}`
+            avatar: `${avatarName}`,
+            sourceId: nativeId,
+            source: 'native'
           }
           ctx.body = {
             code: 1,

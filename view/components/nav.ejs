@@ -1,0 +1,51 @@
+<div class="nav">
+    <div class="ui container">
+      <div class="ui secondary menu">
+        <a class="item active">
+          Home
+        </a>
+        <a class="item">
+          Messages
+        </a>
+        <a class="item">
+          Friends
+        </a>
+        <div class="right menu">
+          <% if (app.session.userInfo) { %>
+          <div class="item ui inline dropdown">
+            <div class="text">
+              <% if (app.session.userInfo.source === 'github') { %>
+              <img src="<%= app.session.userInfo.avatar %>" alt="">
+              <% } else { %>
+              <img src="/img/<%= app.session.userInfo.avatar %>" alt="">
+              <% } %>
+            </div>
+            <div class="menu" style="display: none">
+              <div class="item">
+                <a href="/updateUser">个人信息</a>
+              </div>
+              <div class="item">
+                <a href="/signin/logout">退出</a>
+              </div>
+            </div>
+          </div>
+          <% } else { %>
+          <div class="item">
+            <a href="/signin">登录</a>
+          </div>
+          <div class="item">
+            <a href="/signup">注册</a>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+</div>
+<script type="text/javascript">
+  $('.nav .dropdown').mouseenter(function (e) {
+    $(this).children('.menu').fadeIn(350)
+  })
+  $('.nav .dropdown').mouseleave(function (e) {
+    $(this).children('.menu').fadeOut(350)
+  })
+</script>

@@ -7,10 +7,6 @@ var router = new Router({
 })
 
 router.get('/', async ctx => {
-  if (ctx.session.userInfo) {
-    ctx.state.app.status = ctx.session.status
-    ctx.state.app.msg = ctx.session.msg
-  }
   return ctx.render('index')
 }).post('/', async ctx => {
   console.log(ctx.request.body)

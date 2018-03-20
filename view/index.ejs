@@ -5,15 +5,15 @@
   <div class="">
     你好，<b><%= app.session.userInfo.username %></b>
     用户信息：<%- JSON.stringify(app.session.userInfo) %>
+    <% if (app.session.userInfo.source === 'github') { %>
     <img src="<%= app.session.userInfo.avatar %>" alt="">
-    <p>
-      <a href="/signin/logout">注销</a>
-    </p>
+    <% } else { %>
+    <img src="/img/<%= app.session.userInfo.avatar %>" alt="">
+    <% } %>
   </div>
   <% } else {%>
   <div class="">
-    <a href="/signin">登录</a>
-    <a href="/signup">注册</a>
+    登录一下？
   </div>
   <% } %>
 </div>

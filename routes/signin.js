@@ -50,17 +50,40 @@ router
       let ouathUser = await userModel.findUserBySourceId(userInfo.id).then((data) => {
         return data
       })
-
+      // 判断是否该用户已授权并入库
       if (ouathUser.length) {
-        ctx.session.userInfo = ouathUser[0]
-        ctx.session.msg = `登录成功，欢迎您${ouathUser[0]['username']}`
-        ctx.session.status = 1
+        // 判断 github 用户的用户名是否改变
+        if (ouathUser.username === userInfo.login && ouathUser.avatar === userInfo.avatar_url) {
+          ctx.session.userInfo = ouathUser[0]
+          ctx.response.redirect('/')
+        } else {
+          // 更新用户表中 github 用户的用户名
+          let updateUsername = await userModel.updateGithubUserById(userInfo.login, userInfo.avatar_url, moment().format('YYYY-MM-DD HH:mm:ss'), userInfo.id).then(data => {
+            return data ? true : false
+          }).catch(err => {
+            log.error('更新 github 用户名失败', JSON.stringify(err))
+            return false
+          })
+          if (updateUsername) {
+            ctx.session.userInfo = {
+              username: userInfo.login,
+              avatar: userInfo.avatar_url,
+              sourceId: userInfo.id,
+              source: 'github'
+            }
+            ctx.response.redirect('/')
+          } else {
+            ctx.session.errorMsg = `github 授权后用户信息更新失败，请尝试重新授权`
+            ctx.session.status = 2
+            ctx.redirect('/signin')
+          }
+        }
       } else {
         let githubToTable =  await userModel.addUser([
           userInfo.id,
           userInfo.login,
           null,
-          null,
+          3,
           userInfo.avatar_url,
           null,
           'github',
@@ -69,7 +92,8 @@ router
         ]).then((result) => {
           ctx.session.userInfo = {
             username: userInfo.login,
-            avatar: userInfo.avatar_url
+            avatar: userInfo.avatar_url,
+            sourceId: userInfo.id
           }
           return true
         }).catch(err => {
@@ -78,17 +102,16 @@ router
           return false
         })
         if (githubToTable) {
-          ctx.session.status = 1
-          ctx.session.msg = '授权成功'
           ctx.response.redirect('/')
         } else {
           ctx.session.status = 2
-          ctx.redirect('/signup')
+          ctx.redirect('/signin')
         }
       }
     } else {
       ctx.session.status = 2
       ctx.session.msg = '获取 github 用户授权失败'
+      ctx.response.redirect('/signin')
     }
   })
   .get('/logout', async ctx => {

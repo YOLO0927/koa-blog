@@ -77,7 +77,7 @@
         return;
       };
       if (!/image/g.test(file.type)) {
-        fade("请上传图片文件!")
+        $('<div>请上传图片文件</div>').toast(3000)
         $('#avatar').val('')
         $('form .preview').attr('src', '')
         $('form .preview').fadeOut()

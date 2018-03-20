@@ -1,14 +1,14 @@
 /* ---------- 全局样式 ---------- */
 
 body {
-    width: 1100px;
     height: 100%;
     margin: 0 auto;
-    padding-top: 40px;
+    font-size: 16px;
+    padding-top: 4em;
 }
 
 a:hover {
-    border-bottom: 3px solid #4fc08d;
+    color: #4fc08d;
 }
 
 .button {
@@ -25,35 +25,35 @@ a:hover {
 
 /* ---------- nav ---------- */
 
-.nav {
-    margin-bottom: 20px;
-    color: #999;
-    text-align: center;
+.nav{
+  padding: 0em 0em;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #DDDDDD;
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.04);
+  position: fixed;
+  top: 0px;
+  z-index: 900;
+  left: 0%;
+  padding: 0.5em 0em;
+  width: 100%;
+  border-bottom: 1px solid transparent;
 }
-
-.nav h1 {
-    color: #4fc08d;
-    display: inline-block;
-    margin: 10px 0;
+.nav .ui.secondary.menu{
+  min-height: 0;
 }
-
-/* ---------- nav-setting ---------- */
-
-.nav-setting {
-    position: fixed;
-    right: 30px;
-    top: 35px;
-    z-index: 999;
+.nav .ui.dropdown .menu{
+  transition: none;
 }
-
-.nav-setting .ui.dropdown.button {
-    padding: 10px 10px 0 10px;
-    background-color: #fff !important;
+.nav .ui.secondary.menu .dropdown.item>.menu{
+  margin-top: 0;
 }
-
-.nav-setting .icon.bars {
-    color: #000;
-    font-size: 18px;
+.nav .ui.dropdown>.text>img{
+  margin-right: 0;
+  border-radius: 50%;
+}
+.nav .ui.menu .right.menu .dropdown:last-child .menu{
+  left: 0;
+  right: auto;
 }
 
 /* ---------- post-content ---------- */
@@ -82,7 +82,6 @@ a:hover {
 }
 .img-box > img.preview{
   width: 100%;
-  display: none;
 }
 .ui.pointing.red.basic.label{
   display: none;

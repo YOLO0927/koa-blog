@@ -14,7 +14,11 @@ module.exports = [
       log.error('server error', err)
     }
   },
-  bodyParser(),
+  bodyParser({
+    jsonLimit: '10mb',
+    textLimit: '10mb',
+    formLimit: '10mb'
+  }),
   // 模板引擎的全局对象设置
   async (ctx, next) => {
     ctx.state.app = {

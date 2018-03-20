@@ -22,22 +22,56 @@ connect.createTable(users_sql).then((data) => {
 })
 
 let addUser = (values) => {
-  let sql = 'insert into users set sourceId=?,username=?,password=?,gender=?,avatar=?,sign=?,source=?,create_time=?,update_time=?;'
+  let sql = `insert into users set sourceId = ?,
+             username = ?,
+             password = ?,
+             gender = ?,
+             avatar = ?,
+             sign = ?,
+             source = ?,
+             create_time = ?,
+             update_time = ?`
   return connect.query(sql, values)
 }
 
 let findUserByName = (name) => {
-  let sql = `select * from users where username="${name}"`
+  let sql = `select * from users where username = "${name}" and source="native"`
   return connect.query(sql, [])
 }
 
 let findUserBySourceId = (sourceId) => {
-  let sql = `select * from users where sourceId="${sourceId}"`
+  let sql = `select * from users where sourceId = "${sourceId}"`
   return connect.query(sql, [])
 }
 
+let updateGithubUserById = (name, imgUrl, updateTime, id) => {
+  let sql = `update users
+             set username = "${name}", avatar = "${imgUrl}", update_time="${updateTime}"
+             where sourceId = "${id}"`
+  return connect.query(sql, [])
+}
+
+let updateUserInfoById = (userInfo, source)  => {
+  let sqlGithub = `update users
+                   set gender = "${userInfo.gender}",
+                       sign = "${userInfo.sign}",
+                       update_time = "${userInfo.updateTime}"
+                   where sourceId = "${userInfo.sourceId}"`
+  let sqlNative = `update users
+                   set username = "${userInfo.username}",
+                       password = "${userInfo.password}",
+                       gender = "${userInfo.gender}",
+                       avatar = "${userInfo.avatar}",
+                       sign = "${userInfo.sign}",
+                       update_time = "${userInfo.updateTime}"
+                   where sourceId = "${userInfo.sourceId}"`
+  return connect.query(source === 'github' ? sqlGithub : sqlNative, [])
+}
+
 module.exports = {
-  addUser: addUser,
-  findUserByName: findUserByName,
-  findUserBySourceId: findUserBySourceId
+  addUser,
+  findUserByName,
+  findUserBySourceId,
+  updateGithubUserById,
+  updateUserInfoById
 }
