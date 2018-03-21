@@ -12,40 +12,25 @@ var router = new Router({
 
 router
   .get('/', async ctx => {
-    let userInfo = await userModel.findUserBySourceId(ctx.session.userInfo.sourceId).then(data => {
-      if (data.length) {
-        console.log(data)
-        delete data[0].password
-        return data[0]
-      } else {
-        return null
-      }
-    })
+    let userInfo = await userModel.getUserInfoBySourceId(ctx.session.userInfo.sourceId)
+    ctx.session.userInfo = userInfo
     return ctx.render('updateUserInfo', {
       userInfo: userInfo
     })
   })
   .post('/userInfo', async ctx => {
-    let userInfo = ctx.request.body
-    userInfo.updateTime = moment().format('YYYY-MM-DD HH:mm:ss')
+    let userInfo = JSON.parse(JSON.stringify(ctx.request.body))
     if (ctx.session.userInfo.source === 'native') {
       try {
-        if (!(ctx.request.body.username.length >= 1 && ctx.request.body.username.length <= 10)) {
+        if (!(userInfo.username.length >= 1 && userInfo.username.length <= 10)) {
           throw new Error('名字请限制在1-10个字符之间')
         }
-        if (ctx.request.body.password.length < 6) {
-          throw new Error('密码至少6个字符');
-        }
 
-        if (ctx.request.body.password !== ctx.request.body.repassword) {
-          throw new Error('两次密码输入不一致')
-        }
-
-        if ((['1', '2', '3'].indexOf(ctx.request.body.gender)) === -1) {
+        if ((['1', '2', '3'].indexOf(userInfo.gender)) === -1) {
           throw new Error('请选择正确的性别')
         }
 
-        let base64Data = ctx.request.body.avatar.replace(/^data:image\/\w+;base64,/, "");
+        let base64Data = userInfo.avatar.replace(/^data:image\/\w+;base64,/, "");
         let dataBuffer = new Buffer(base64Data, 'base64')
         let avatarName = `${moment().format('YYYY-MM-DD-HH-mm-ss-SS')}.png`
         let uploadAvatar = await new Promise((resolve, reject) => {
@@ -74,10 +59,10 @@ router
       }
     }
 
+    // 过滤出符合用户表的数据结构
     userInfo.gender = parseInt(userInfo.gender)
-    userInfo.password = md5(userInfo.password)
     userInfo.sourceId = ctx.session.userInfo.sourceId
-    console.log(userInfo, ctx.session.userInfo.source)
+    userInfo.updateTime = moment().format('YYYY-MM-DD HH:mm:ss')
     let update = userModel.updateUserInfoById(userInfo, ctx.session.userInfo.source).then(data => {
       return data ? true : false
     }).catch(err => {
@@ -87,6 +72,16 @@ router
       code: update ? 1 : -1,
       data: {},
       msg: update ? '信息更新成功' : '信息更新失败，请尝试重试或联系客服'
+    }
+  })
+  .post('/updatePassword', async ctx => {
+    let update = await userModel.updatePasswordById(md5(ctx.request.body.password), ctx.session.userInfo.sourceId).then(data => {
+      return data ? true : false
+    })
+    ctx.body = {
+      code: update ? 1 : -1,
+      data: {},
+      msg: update ? '密码修改成功' : '密码修改失败，请尝试重新修改'
     }
   })
 

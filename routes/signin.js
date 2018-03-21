@@ -22,19 +22,19 @@ router
     }
   })
   .post('/', async ctx => {
-    await userModel.findUserByName(ctx.request.body.username).then(async data => {
-      if (data[0]['username'] === ctx.request.body.username && data[0]['password'] === md5(ctx.request.body.password)) {
-        delete data[0]['password']
-        ctx.session.userInfo = data[0]
-        ctx.session.msg = `登录成功，欢迎您${data[0]['username']}`
-        ctx.session.status = 1
-        ctx.response.redirect('/')
-      } else {
-        ctx.session.status = 2
-        ctx.session.msg = '用户名或密码不正确'
-        ctx.response.redirect('/signin')
-      }
+    let user = await userModel.findUserByName(ctx.request.body.username).then(data => {
+      if (data.length) return data[0]
+      return false
     })
+    if (user && user['username'] === ctx.request.body.username && user['password'] === md5(ctx.request.body.password)) {
+      delete user['password']
+      ctx.session.userInfo = user
+      ctx.response.redirect('/')
+    } else {
+      ctx.session.status = 2
+      ctx.session.msg = '用户名或密码不正确'
+      ctx.response.redirect('/signin')
+    }
   })
   .get('/github', async ctx => {
     ctx.response.redirect(`https://github.com/login/oauth/authorize?client_id=${config.GITHUB_ID}`)
@@ -65,12 +65,8 @@ router
             return false
           })
           if (updateUsername) {
-            ctx.session.userInfo = {
-              username: userInfo.login,
-              avatar: userInfo.avatar_url,
-              sourceId: userInfo.id,
-              source: 'github'
-            }
+            let user = await userModel.getUserInfoBySourceId(userInfo.login)
+            ctx.session.userInfo = user
             ctx.response.redirect('/')
           } else {
             ctx.session.errorMsg = `github 授权后用户信息更新失败，请尝试重新授权`
@@ -79,6 +75,7 @@ router
           }
         }
       } else {
+        // 将新 github 用户添加至用户表
         let githubToTable =  await userModel.addUser([
           userInfo.id,
           userInfo.login,

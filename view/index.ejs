@@ -1,6 +1,5 @@
 <%- include('header') %>
-<div class="">
-  <h1>作者：<%= app.author %></h1>
+<div class="ui main text container">
   <% if (app.session.userInfo) { %>
   <div class="">
     你好，<b><%= app.session.userInfo.username %></b>
@@ -13,7 +12,7 @@
   </div>
   <% } else {%>
   <div class="">
-    登录一下？
+    登录一下?
   </div>
   <% } %>
 </div>

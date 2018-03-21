@@ -30,7 +30,8 @@
       'border-radius': '5px',
       'text-align': 'center',
       'line-height': '1.5em',
-      'display': 'none'
+      'display': 'none',
+      'z-index': '1000'
     }
     var cssList = targetDom[0].style;
     for (var key in defaultCss) {

@@ -90,8 +90,6 @@ router
           return false
         })
         if(isSuccess) {
-          ctx.session.status = 0
-          ctx.session.msg = ''
           ctx.session.userInfo = {
             username: ctx.request.body.username,
             avatar: `${avatarName}`,

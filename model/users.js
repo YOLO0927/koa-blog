@@ -59,7 +59,6 @@ let updateUserInfoById = (userInfo, source)  => {
                    where sourceId = "${userInfo.sourceId}"`
   let sqlNative = `update users
                    set username = "${userInfo.username}",
-                       password = "${userInfo.password}",
                        gender = "${userInfo.gender}",
                        avatar = "${userInfo.avatar}",
                        sign = "${userInfo.sign}",
@@ -68,10 +67,32 @@ let updateUserInfoById = (userInfo, source)  => {
   return connect.query(source === 'github' ? sqlGithub : sqlNative, [])
 }
 
+let updatePasswordById = (password, id) => {
+  let sql = `update users set password = "${password}" where sourceId = "${id}"`
+  return connect.query(sql, [])
+}
+
+let getUserInfoBySourceId = (sourceId) => {
+  return new Promise((resolve, reject) => {
+    findUserBySourceId(sourceId).then(data => {
+      if (data.length) {
+        delete data[0].password
+        resolve(data[0])
+      } else {
+        resolve(null)
+      }
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
 module.exports = {
   addUser,
   findUserByName,
   findUserBySourceId,
   updateGithubUserById,
-  updateUserInfoById
+  updateUserInfoById,
+  updatePasswordById,
+  getUserInfoBySourceId
 }

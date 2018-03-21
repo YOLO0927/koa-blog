@@ -23,6 +23,7 @@
   "devDependencies": {
     "ejs": "^2.5.7",
     "koa-bodyparser": "^4.2.0",
+    "koa-livereload": "^0.2.0",
     "koa-session": "^5.8.1",
     "koa-views": "^6.1.4",
     "minimist": "^1.2.0",

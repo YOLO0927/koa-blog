@@ -1,0 +1,65 @@
+<%- include('header') %>
+<script src="https://cdn.bootcss.com/markdown-it/8.4.1/markdown-it.min.js"></script>
+<div class="ui grid article">
+    <div class="sixteen wide column">
+        <form action="/posts" class="ui form segment" method="post">
+            <div class="field sixteen inline required" style="display: flex;">
+              <div>
+                <div class="ui selection dropdown">
+                  <input name="gender" type="hidden" value="default">
+                  <i class="dropdown icon"></i>
+                  <div class="text">请选择</div>
+                  <div class="menu">
+                      <div class="item" data-value="default">请选择</div>
+                      <div class="item" data-value="0">原创</div>
+                      <div class="item" data-value="1">转载</div>
+                      <div class="item" data-value="2">翻译</div>
+                  </div>
+               </div>
+             </div>
+              <div class="ui labeled input" style="margin-right: 0.85714286em; flex: 1;">
+                <div class="ui label">标题</div>
+                <input type="text" placeholder="请填写标题...">
+              </div>
+              <div class="">
+                <input class="ui green button" type="submit" value="发布文章">
+              </div>
+            </div>
+            <div class="content-box">
+              <div class="cotent">
+                <textarea name="content" cols="30" rows="45"></textarea>
+              </div>
+              <div class="display-box">
+                <div class="arrow-box">
+                  <i class="angle right icon"></i>
+                  <i style="display: none;" class="angle left icon"></i>
+                </div>
+                <div class="display-content">
+
+                </div>
+              </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+  $('.ui.dropdown').dropdown()
+  var md = window.markdownit()
+  $('[name=content]').keyup(function () {
+    $('.display-content').html(md.render($(this).val()))
+  })
+  $('.display-content').css('height', $('.cotent').css('height'))
+  $('.angle.right.icon').click(function () {
+    $('.cotent').css('width', '100%')
+    $('.display-box').css('width', 0)
+    $(this).css('display', 'none')
+    $('.angle.left.icon').css('display', 'block')
+  })
+  $('.angle.left.icon').click(function () {
+    $('.cotent').css('width', '50%')
+    $('.display-box').css('width', '50%')
+    $(this).css('display', 'none')
+    $('.angle.right.icon').css('display', 'block')
+  })
+</script>
+<%- include('footer') %>

@@ -6,9 +6,9 @@ const views = require('koa-views')
 const session = require('koa-session')
 const logger = require('./public/log.js')
 const routes = require('./routes/route.js')
+const config = require('./config/default.js')
 // 自定义中间件
 const middlewares = require('./middlewares')
-
 const app = new Koa()
 const log = new logger()
 
@@ -25,7 +25,7 @@ app.use(views(path.join(__dirname, 'view'), {
 // session 配置
 const CONFIG = {
   key: 'koa:sess',
-  maxAge: 86400 * 1000,
+  maxAge: 24 * 3600 * 1000,
   overwrite: true,
   httpOnly: true,
   signed: true,
@@ -47,4 +47,4 @@ app.on('error', (err) => {
   log.error('server error', err)
 })
 
-app.listen(3000)
+app.listen(config.port)
