@@ -50,6 +50,7 @@ router
       let ouathUser = await userModel.findUserBySourceId(userInfo.id).then((data) => {
         return data
       })
+
       // 判断是否该用户已授权并入库
       if (ouathUser.length) {
         // 判断 github 用户的用户名是否改变
@@ -65,7 +66,7 @@ router
             return false
           })
           if (updateUsername) {
-            let user = await userModel.getUserInfoBySourceId(userInfo.login)
+            let user = await userModel.getUserInfoBySourceId(userInfo.id)
             ctx.session.userInfo = user
             ctx.response.redirect('/')
           } else {
