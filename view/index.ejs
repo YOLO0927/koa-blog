@@ -1,5 +1,6 @@
 <%- include('header') %>
-<div class="ui main text container">
+<div class="ui main text container" id="main">
+  <%- include('components/article-list', {articles}) %>
   <% if (app.session.userInfo) { %>
   <div class="">
     你好，<b><%= app.session.userInfo.username %></b>

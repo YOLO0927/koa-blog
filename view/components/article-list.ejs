@@ -1,0 +1,38 @@
+<% for(var i = 0; i < articles.length; i++) {%>
+<div class="ui raised link card article-list">
+  <div class="content">
+    <div class="source">
+      来自标签：<%= articles[i].tag %><%= ' · ' + articles[i].countdown %>
+    </div>
+    <div class="header">
+      <img src="/img/<%= articles[i].avatar %>" alt="">
+      <span class="username"><%= articles[i].username %></span>
+      <span class="sign">，<%= articles[i].sign %></span>
+    </div>
+    <div class="meta">
+      <a class="title" href="/article/<%= articles[i].id %>"><%= articles[i].title %></a>
+    </div>
+    <% if (articles[i].picture) {%>
+    <div class="description flex">
+      <div class="">
+        <img src="/img/<%= articles[i].picture %>" alt="">
+      </div>
+      <div class="">
+        <p><%= articles[i].content %></p>
+      </div>
+    </div>
+    <% } else {%>
+      <div class="description">
+        <p><%= articles[i].content %></p>
+      </div>
+    <% } %>
+  </div>
+  <div class="extra content">
+    <div class="right floated author">
+      <span>
+        <i class="eye icon"></i> <%= articles[i].pv %>
+      </span>
+    </div>
+  </div>
+</div>
+<% } %>

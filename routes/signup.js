@@ -84,30 +84,29 @@ router
           moment().format('YYYY-MM-DD HH:mm:ss')
         ]).then(result => {
           delete ctx.request.body.password
-          return true
+          if(result) {
+            ctx.session.userInfo = {
+              username: ctx.request.body.username,
+              avatar: `${avatarName}`,
+              sourceId: nativeId,
+              source: 'native'
+            }
+            ctx.body = {
+              code: 1,
+              data: ctx.session.userInfo,
+              msg: '注册成功'
+            }
+          } else {
+            ctx.body = {
+              code: -1,
+              data: {},
+              msg: '注册用户失败'
+            }
+          }
         }).catch(err => {
           log.error('插入用户失败', JSON.stringify(err))
           return false
         })
-        if(isSuccess) {
-          ctx.session.userInfo = {
-            username: ctx.request.body.username,
-            avatar: `${avatarName}`,
-            sourceId: nativeId,
-            source: 'native'
-          }
-          ctx.body = {
-            code: 1,
-            data: ctx.session.userInfo,
-            msg: '注册成功'
-          }
-        } else {
-          ctx.body = {
-            code: -1,
-            data: {},
-            msg: '注册用户失败'
-          }
-        }
       }
     }).catch((err) => {
       log.error('查询用户信息错误', JSON.stringify(err))

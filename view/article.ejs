@@ -1,0 +1,19 @@
+<%- include('header') %>
+<div class="ui main text container article">
+  <h1><%= article.title %></h1>
+  <div class="flex user-info">
+    <div class="avatar-box">
+      <img src="/img/<%= article.avatar %>" alt="">
+    </div>
+    <div class="">
+      <p><%= article.username %></p>
+      <p><%= article.update_time %> 阅读(<%= article.pv %>)</p>
+    </div>
+  </div>
+  <div class="text-center">
+    <img style="width: 90%" src="/img/<%= article.picture %>" alt="">
+  </div>
+</div>
+  <%= JSON.stringify(article) %>
+</div>
+<%- include('footer') %>

@@ -38,7 +38,7 @@
             </div>
             <% if (app.session.userInfo.source === 'native') { %>
             <div class="ui dimmer modals page transition">
-              <div class="ui mini test modal transition hidden">
+              <div class="ui mini test password-modal modal transition hidden">
                 <div class="header">修改密码</div>
                 <div class="content">
                   <div class="ui form">
@@ -57,7 +57,7 @@
                   </div>
                 </div>
                 <div class="actions">
-                  <div class="ui red button">
+                  <div class="cancelPasswordModal ui red button">
                     取消
                   </div>
                   <div id="updatePassword" class="ui green button">
@@ -68,8 +68,11 @@
             </div>
             <script type="text/javascript">
               function updatePassword () {
-                $('.mini.modal').modal('show')
+                $('.password-modal.mini.modal').modal('show')
               }
+              $('.cancelPasswordModal').click(function () {
+                $('.password-modal.mini.modal').modal('hide')
+              })
               $('#updatePassword').click(function () {
                 if ($('[name=password]').val() !== $('[name=repeatpassword]').val()) {
                   $('<div>两次密码输入不一致</div>').toast(3000)
@@ -84,7 +87,7 @@
                   type: 'post',
                   success: function (res) {
                     if (res.code === 1) {
-                      $('.mini.modal').modal('hide')
+                      $('.password-modal.mini.modal').modal('hide')
                     }
                     $('<div>' + res.msg + '</div>').toast(3000)
                   }

@@ -45,12 +45,12 @@ router
     }).catch(err => {
       log.error('获取 github 用户信息失败', JSON.stringify(err))
     })
+
     if (userInfo) {
       // 获取授权信息后，先查询用户在用户表中是否存在，存在则更新表数据并直接返回，否则返回前先将用户入库
       let ouathUser = await userModel.findUserBySourceId(userInfo.id).then((data) => {
         return data
       })
-
       // 判断是否该用户已授权并入库
       if (ouathUser.length) {
         // 判断 github 用户的用户名是否改变

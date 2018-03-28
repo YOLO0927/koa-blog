@@ -1,6 +1,9 @@
 var connect = require('../lib/index')
 var log = new require('../public/log.js')()
-
+/**
+  @property {Int} gender 性别 男 1; 女 2
+  @property {Int} source 用户来源 native 本站注册; github github授权用户
+*/
 let users_sql = `CREATE TABLE IF NOT EXISTS users(
                   id INT NOT NULL AUTO_INCREMENT,
                   sourceId VARCHAR(150),
@@ -16,9 +19,9 @@ let users_sql = `CREATE TABLE IF NOT EXISTS users(
                 )`
 
 connect.createTable(users_sql).then((data) => {
-  console.log('创建成功')
+  console.log('创建用户表成功')
 }).catch((err) => {
-  log.error('创建表错误', JSON.stringify(err))
+  log.error('创建用户表错误', JSON.stringify(err))
 })
 
 let addUser = (values) => {
