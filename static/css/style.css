@@ -59,18 +59,28 @@ a:hover {
 }
 
 /* ------------查看文章----------- */
-.article h1{
+.article > h1{
   text-align: center;
   margin: 1em auto;
 }
-.article .user-info{
 
-}
-.article .user-info .avatar-box > img{
+.article > .user-info .avatar-box > img{
   width: 3em;
   border-radius: 50%;
 }
-
+.article > .user-info .user-content{
+  margin-left: 1em;
+  flex: 1;
+}
+.article > .user-info .user-content > .sign{
+  font-size: 0.8em;
+  color: #646464;
+}
+.article > .content{
+  margin: 20px auto 0;
+  line-height: 1.8;
+  color: #1a1a1a;
+}
 /* ---------- 文章创建页 ---------- */
 .article-titleImg{
   background-color: #f7f8f9;

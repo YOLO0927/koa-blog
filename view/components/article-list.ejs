@@ -1,14 +1,27 @@
 <% for(var i = 0; i < articles.length; i++) {%>
 <div class="ui raised link card article-list">
   <div class="content">
-    <div class="source">
-      来自标签：<%= articles[i].tag %><%= ' · ' + articles[i].countdown %>
+    <div class="source flex">
+      <div style="flex: 1;">
+        <span>来自标签：<%= articles[i].tag %><%= ' · ' + articles[i].countdown %></span>
+      </div>
+      <div>
+        <% if (articles[i].type === '1') { %>
+        <a class="ui tag label">原创</a>
+        <% } else if (articles[i].type === '2') { %>
+        <a class="ui tag label">转载</a>
+        <% } else if (articles[i].type === '3') { %>
+        <a class="ui tag label">翻译</a>
+        <% } %>
+      </div>
     </div>
+    <% if (articles[i].avatar && articles[i].username) { %>
     <div class="header">
       <img src="/img/<%= articles[i].avatar %>" alt="">
       <span class="username"><%= articles[i].username %></span>
       <span class="sign">，<%= articles[i].sign %></span>
     </div>
+    <% } %>
     <div class="meta">
       <a class="title" href="/article/<%= articles[i].id %>"><%= articles[i].title %></a>
     </div>
@@ -29,7 +42,17 @@
   </div>
   <div class="extra content">
     <div class="right floated author">
-      <span>
+      <% if (app.session.userInfo && articles[i].author === app.session.userInfo.sourceId) { %>
+      <a href="/article/<%= articles[i].id %>/edit" class="ui label">
+        <i class="edit icon"></i>
+        编辑
+      </a>
+      <a class="ui label">
+        <i class="remove icon"></i>
+        删除
+      </a>
+      <% } %>
+      <span data-tooltip="本文浏览量: <%= articles[i].pv %>" data-inverted="">
         <i class="eye icon"></i> <%= articles[i].pv %>
       </span>
     </div>

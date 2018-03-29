@@ -1,19 +1,28 @@
 <%- include('header') %>
 <div class="ui main text container article">
+  <% if (article.picture) { %>
+  <div class="text-center">
+    <img style="width: 100%" src="/img/<%= article.picture %>" alt="">
+  </div>
+  <% } %>
   <h1><%= article.title %></h1>
   <div class="flex user-info">
     <div class="avatar-box">
       <img src="/img/<%= article.avatar %>" alt="">
     </div>
-    <div class="">
+    <div class="user-content">
       <p><%= article.username %></p>
-      <p><%= article.update_time %> 阅读(<%= article.pv %>)</p>
+      <p class="sign"><%= article.sign %></p>
+    </div>
+    <div style="color: rgba(0,0,0,.4);">
+      <span data-tooltip="本文浏览量" data-inverted="">
+        <i class="eye icon"></i> <%= article.pv %>
+      </span>
     </div>
   </div>
-  <div class="text-center">
-    <img style="width: 90%" src="/img/<%= article.picture %>" alt="">
+  <div class="content">
+    <%- article.content %>
   </div>
 </div>
-  <%= JSON.stringify(article) %>
-</div>
+<script src="https://cdn.bootcss.com/markdown-it/8.4.1/markdown-it.min.js"></script>
 <%- include('footer') %>

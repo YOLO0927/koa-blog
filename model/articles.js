@@ -1,6 +1,9 @@
 var connect = require('../lib/index')
 var log = new require('../public/log.js')()
 
+/**
+  @property {Char} type 文章类型 1：原创; 2：转载; 3：翻译
+*/
 let articles_sql = `CREATE TABLE IF NOT EXISTS articles(
                   id INT(13) NOT NULL AUTO_INCREMENT,
                   tag VARCHAR(100),
@@ -42,7 +45,7 @@ let findArticles = () => {
   return connect.query(sql, [])
 }
 
-let findArticlesById = (id, sourceId) => {
+let findArticlesById = (id) => {
   let sql = `select users.username, users.avatar, users.sign, articles.*
              from articles
              inner join users
@@ -51,19 +54,51 @@ let findArticlesById = (id, sourceId) => {
   return connect.query(sql, [])
 }
 
+let findArticlesByAuthor = (author) => {
+  let sql = `select *
+             from articles
+             where author = '${author}'
+             order by articles.update_time desc`
+  return connect.query(sql, [])
+}
+
 let findArticlesList = (startRow, rowCount) => {
   let sql = `select users.username, users.avatar, users.sign, articles.*
              from articles
              inner join users
              on articles.author = users.sourceId
-             order by articles.update_time
+             order by articles.update_time desc
              limit ${startRow}, ${rowCount}`
   return connect.query(sql, [])
+}
+
+let updatePv = (articleId) => {
+  let sql = `update articles
+             set pv = pv + 1
+             where
+            	 id = ${articleId}`
+  return connect.query(sql, [])
+}
+
+let updateArticleById = (articleId, values) => {
+  let sql = `update articles set
+             title = ?,
+             tag = ?,
+             abstract = ?,
+             content = ?,
+             type = ?,
+             picture = ?,
+             update_time = ?
+             where id = ${articleId}`
+  return connect.query(sql, values)
 }
 
 module.exports = {
   addArticles,
   findArticles,
   findArticlesById,
-  findArticlesList
+  findArticlesByAuthor,
+  findArticlesList,
+  updatePv,
+  updateArticleById
 }

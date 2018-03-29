@@ -11,15 +11,12 @@
                   <div class="text">请选择</div>
                   <div class="menu">
                       <div class="item" data-value="default">请选择</div>
-                      <div class="item" data-value="1">原创</div>
-                      <div class="item" data-value="2">转载</div>
-                      <div class="item" data-value="3">翻译</div>
                   </div>
                </div>
              </div>
               <div class="ui labeled input" style="margin-right: 0.85714286em; flex: 1;">
                 <div class="ui label">标题</div>
-                <input name="title" type="text" placeholder="请填写标题...">
+                <input name="title" type="text" value="<%= article.title %>" placeholder="请填写标题...">
               </div>
               <div>
                 <input class="ui green button trigger-submit" type="button" value="发布文章">
@@ -27,7 +24,7 @@
             </div>
             <div class="content-box">
               <div class="cotent">
-                <textarea name="content" cols="30" rows="30"></textarea>
+                <textarea name="content" cols="30" rows="30"><%= article.content %></textarea>
               </div>
               <div class="display-box">
                 <div class="arrow-box">
@@ -48,7 +45,7 @@
                   <div class="sixteen wide field">
                     <label style="width: 6em">添加头图</label>
                     <div class="article-titleImg">
-                      <img src="" alt="">
+                      <img src="/img/<%= article.picture %>" alt="">
                       <div class="icon-box">
                         <i class="camera icon"></i>
                       </div>
@@ -59,13 +56,13 @@
                 <div class="inline fields">
                   <div class="sixteen wide field">
                     <label style="width: 6em">添加标签</label>
-                    <input type="text" name="tag" placeholder="请输入标签...">
+                    <input type="text" name="tag" value="<%= article.tag %>" placeholder="请输入标签...">
                   </div>
                 </div>
                 <div class="inline fields">
                   <div class="sixteen wide field">
                     <label style="width: 6em">添加摘要</label>
-                    <textarea name="abstract" cols="30" rows="5" placeholder="请输入摘要..."></textarea>
+                    <textarea name="abstract" cols="30" rows="5" placeholder="请输入摘要..."><%= article.abstract %></textarea>
                   </div>
                 </div>
               </div>
@@ -163,12 +160,30 @@
   })
   // 初始化文章类型选项
   $('.article-create .ui.dropdown').dropdown({
+    values: [
+      {
+        name: '原创',
+        value: '1',
+        selected: '<%= article.type %>' === '1'
+      },
+      {
+        name: '转载',
+        value: '2',
+        selected: '<%= article.type %>' === '2'
+      },
+      {
+        name: '翻译',
+        value: '2',
+        selected: '<%= article.type %>' === '3'
+      }
+    ],
     onChange: function (value, text, $selectedItem) {
       articleType = value
     }
   })
   // markdown 转换预览
   var md = window.markdownit()
+  $('.display-content').html(md.render($('[name=content]').val()))
   $('[name=content]').keyup(function () {
     $('.display-content').html(md.render($(this).val()))
   })
@@ -190,7 +205,7 @@
     e.preventDefault();
     e.stopPropagation();
     $.ajax({
-      url: '/article/addArticles',
+      url: '/article/<%= article.id %>/edit',
       type: 'post',
       data: {
         title: $('[name=title]').val(),
@@ -203,7 +218,7 @@
       dataType: 'json',
       success: function (res) {
         $('<div>' + res.msg + '</div>').toast(3000, function () {
-          location.href = '/'
+          location.href = '/article/author/<%= app.session.userInfo.username %>'
         })
       }
     })
