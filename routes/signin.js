@@ -76,8 +76,7 @@ router
           }
         }
       } else {
-        // 将新 github 用户添加至用户表
-        let githubToTable =  await userModel.addUser([
+        let user = await Promise.all([await userModel.addUser([
           userInfo.id,
           userInfo.login,
           null,
@@ -87,19 +86,15 @@ router
           'github',
           moment().format('YYYY-MM-DD HH:mm:ss'),
           moment().format('YYYY-MM-DD HH:mm:ss')
-        ]).then((result) => {
-          ctx.session.userInfo = {
-            username: userInfo.login,
-            avatar: userInfo.avatar_url,
-            sourceId: userInfo.id
-          }
-          return true
+        ]), await userModel.findUserBySourceId(userInfo.id)]).then(data => {
+          return data[1][0]
         }).catch(err => {
           log.error('插入用户失败', JSON.stringify(err))
           ctx.session.errorMsg = `授权失败，请尝试注册用户，原因：${JSON.stringify(err)}`
           return false
         })
-        if (githubToTable) {
+        if (user) {
+          ctx.session.userInfo = user
           ctx.response.redirect('/')
         } else {
           ctx.session.status = 2

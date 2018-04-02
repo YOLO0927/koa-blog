@@ -3,7 +3,11 @@
   <div class="ui items">
     <div class="item">
       <div class="image" style="min-width: 150px;">
+        <% if (app.session.userInfo.source === 'native') { %>
         <img src="/img/<%= app.session.userInfo.avatar %>">
+        <% } else if (app.session.userInfo.source === 'github') {%>
+        <img src="<%= app.session.userInfo.avatar %>" alt="">
+        <% } %>
       </div>
       <div class="content">
         <a class="header"><%= app.session.userInfo.username %></a>
@@ -19,6 +23,12 @@
               <a class="ui label">
                 访问量
                 <div class="detail"><%= staticties.pvCount %></div>
+              </a>
+            </div>
+            <div class="item">
+              <a class="ui label">
+                文章数
+                <div class="detail"><%= staticties.articleCount %></div>
               </a>
             </div>
             <div class="item">

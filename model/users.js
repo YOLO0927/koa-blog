@@ -13,8 +13,8 @@ let users_sql = `CREATE TABLE IF NOT EXISTS users(
                   avatar VARCHAR(1024) NOT NULL,
                   sign VARCHAR(48),
                   source VARCHAR(150) NOT NULL,
-                  create_time TIMESTAMP,
-                  update_time TIMESTAMP,
+                  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                   PRIMARY KEY( id )
                 )`
 

@@ -61,9 +61,9 @@ router
       return false
     })
   })
-  .get('/:id', async ctx => {
+  .get('/:articleId', async ctx => {
     // 先更新 pv再查询文章
-    let articleData = await Promise.all([articleModel.updatePv(ctx.params.id), articleModel.findArticlesById(ctx.params.id)]).then(data => {
+    let articleData = await Promise.all([articleModel.updatePv(ctx.params.articleId), articleModel.findArticleById(ctx.params.articleId)]).then(data => {
       console.log(data)
       try {
         if (!data[1].length) {
@@ -115,20 +115,20 @@ router
       staticties
     })
   })
-  .get('/:id/edit', async ctx => {
-    let articleData = await articleModel.findArticlesById(ctx.params.id).then(data => {
+  .get('/:articleId/edit', async ctx => {
+    let articleData = await articleModel.findArticleById(ctx.params.articleId).then(data => {
       if (data.length) {
         return data[0]
       } else {
-        log.error('未找到该ID的文章', ctx.params.id)
+        log.error('未找到该ID的文章', ctx.params.articleId)
       }
     }).catch(err => {
       log.error('查询文章失败', JSON.stringify(err))
     })
     return ctx.render('editArticle', {article: articleData})
   })
-  .post('/:id/edit', async ctx => {
-    let allowUpdate = await articleModel.findArticlesById(ctx.params.id).then(data => {
+  .post('/:articleId/edit', async ctx => {
+    let allowUpdate = await articleModel.findArticleById(ctx.params.articleId).then(data => {
       if (data.length) {
         return data[0].author === ctx.session.userInfo.sourceId
       } else {
@@ -163,7 +163,7 @@ router
       let picture = await saveBase64(ctx.request.body.picture).then(imgName => {
         return imgName
       })
-      let update = await articleModel.updateArticleById(ctx.params.id, [
+      let update = await articleModel.updateArticleById(ctx.params.articleId, [
         ctx.request.body.title,
         ctx.request.body.tag || null,
         ctx.request.body.abstract || null,
@@ -180,6 +180,23 @@ router
         code: update ? 1 : -1,
         data: {},
         msg: update ? '更新文章成功' : '更新失败，请重试'
+      }
+    }
+  })
+  .get('/:articleId/delete', async ctx => {
+    try {
+      let verifyUser = await articleModel.findArticleById(articleId).then(user => {
+        if (user.length) {
+          return user[0]
+        } else {
+          throw new error('未找到该文章')
+        }
+      })
+    } catch (e) {
+      ctx.body = {
+        code: -1,
+        data: {},
+        msg: e.message
       }
     }
   })

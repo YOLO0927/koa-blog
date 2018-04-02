@@ -14,8 +14,8 @@ let articles_sql = `CREATE TABLE IF NOT EXISTS articles(
                   author VARCHAR(150),
                   picture  VARCHAR(1024),
                   pv INT,
-                  create_time TIMESTAMP,
-                  update_time TIMESTAMP,
+                  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                   PRIMARY KEY( id )
                 )`
 
@@ -45,7 +45,7 @@ let findArticles = () => {
   return connect.query(sql, [])
 }
 
-let findArticlesById = (id) => {
+let findArticleById = (id) => {
   let sql = `select users.username, users.avatar, users.sign, articles.*
              from articles
              inner join users
@@ -63,7 +63,7 @@ let findArticlesByAuthor = (author) => {
 }
 
 let findArticlesList = (startRow, rowCount) => {
-  let sql = `select users.username, users.avatar, users.sign, articles.*
+  let sql = `select users.username, users.avatar, users.source ,users.sign, articles.*
              from articles
              inner join users
              on articles.author = users.sourceId
@@ -93,10 +93,14 @@ let updateArticleById = (articleId, values) => {
   return connect.query(sql, values)
 }
 
+let deleteArticleById = (articleId) => {
+  let sql = `delete from article where id = ${articleId}`
+}
+
 module.exports = {
   addArticles,
   findArticles,
-  findArticlesById,
+  findArticleById,
   findArticlesByAuthor,
   findArticlesList,
   updatePv,

@@ -8,7 +8,11 @@
   <h1><%= article.title %></h1>
   <div class="flex user-info">
     <div class="avatar-box">
-      <img src="/img/<%= article.avatar %>" alt="">
+      <% if (app.session.userInfo.source === 'native') { %>
+        <img src="/img/<%= article.avatar %>" alt="">
+      <% } else if (app.session.userInfo.source === 'github') { %>
+        <img src="<%= article.avatar %>" alt="">
+      <% } %>
     </div>
     <div class="user-content">
       <p><%= article.username %></p>
