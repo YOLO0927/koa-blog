@@ -1,17 +1,7 @@
 <%- include('header') %>
 <div class="ui main text container" id="main">
-  <%- include('components/article-list', {articles}) %>
-  <% if (app.session.userInfo) { %>
-  <div class="">
-    你好，<b><%= app.session.userInfo.username %></b>
-    用户信息：<%- JSON.stringify(app.session.userInfo) %>
-    <% if (app.session.userInfo.source === 'github') { %>
-    <img src="<%= app.session.userInfo.avatar %>" alt="">
-    <% } else { %>
-    <img src="/img/<%= app.session.userInfo.avatar %>" alt="">
-    <% } %>
-  </div>
-  <% } else {%>
+  <%- include('components/article-list', {articles, target: 'index'}) %>
+  <% if (!app.session.userInfo) { %>
   <div class="">
     登录一下?
   </div>

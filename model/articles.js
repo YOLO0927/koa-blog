@@ -22,7 +22,7 @@ let articles_sql = `CREATE TABLE IF NOT EXISTS articles(
 connect.createTable(articles_sql).then((data) => {
   console.log('创建文章表成功')
 }).catch((err) => {
-  log.error('创建表文章表错误', JSON.stringify(err))
+  log.error('创建文章表错误', JSON.stringify(err))
 })
 
 let addArticles = (values) => {
@@ -46,7 +46,7 @@ let findArticles = () => {
 }
 
 let findArticleById = (id) => {
-  let sql = `select users.username, users.avatar, users.sign, articles.*
+  let sql = `select users.username, users.avatar, users.sign, users.source, articles.*
              from articles
              inner join users
              on articles.author = users.sourceId
@@ -94,7 +94,8 @@ let updateArticleById = (articleId, values) => {
 }
 
 let deleteArticleById = (articleId) => {
-  let sql = `delete from article where id = ${articleId}`
+  let sql = `delete from articles where id = ${articleId}`
+  return connect.query(sql, [])
 }
 
 module.exports = {
@@ -103,6 +104,7 @@ module.exports = {
   findArticleById,
   findArticlesByAuthor,
   findArticlesList,
+  deleteArticleById,
   updatePv,
   updateArticleById
 }

@@ -63,7 +63,40 @@ a:hover {
   text-align: center;
   margin: 1em auto;
 }
-
+.article .login-register-box{
+  width: 100%;
+  margin: 1em 0em;
+  background-color: #e7ecf0;
+  height: 6em;
+  border-radius: 5px;
+  position: relative;
+}
+.article .comment-outline-box{
+  align-items: start;
+  padding-bottom: 1em;
+}
+.article .comment-outline-box .avatar-box img{
+  width: 2em;
+  border-radius: 50%;
+}
+.article .comment-outline-box .comment-box{
+  flex: 1;
+  margin-left: 0.5em;
+}
+.article .comment-outline-box .comment-box textarea{
+  border-radius: 5px;
+  padding: 0.5em 0.5em;
+  font-size: 1em;
+  width: 100%;
+  resize: none;
+  height: 5em;
+}
+.article .login-register-box > .warn-box{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .article > .user-info .avatar-box > img{
   width: 3em;
   border-radius: 50%;

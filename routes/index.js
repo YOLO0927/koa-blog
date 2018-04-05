@@ -14,7 +14,7 @@ router.get('/', async ctx => {
   })
   let articleListFormat = await articleList.map(article => {
     return Object.assign({
-      countdown: countdown(article.update_time)
+      countdown: countdown(article.update_time, '更新于 ')
     }, article)
   })
   return ctx.render('index', {

@@ -2,10 +2,11 @@ var moment = require('moment')
 var Router = require('koa-router')
 var md = require('markdown-it')()
 var articleModel = require('../model/articles')
+var commentModel = require('../model/comments')
 var saveBase64 = require('../public/saveBase64').save
 var log = new require('../public/log.js')()
 var countdown = require('../public/countdown.js').countdown
-
+var checkLogin = require('../middlewares/checkLogin.js')
 var router = new Router({
   prefix: '/article'
 })
@@ -63,18 +64,25 @@ router
   })
   .get('/:articleId', async ctx => {
     // 先更新 pv再查询文章
-    let articleData = await Promise.all([articleModel.updatePv(ctx.params.articleId), articleModel.findArticleById(ctx.params.articleId)]).then(data => {
-      console.log(data)
+    let articleData = await Promise.all([
+      articleModel.updatePv(ctx.params.articleId),
+      articleModel.findArticleById(ctx.params.articleId),
+      commentModel.findComments(ctx.params.articleId)
+    ]).then(data => {
       try {
         if (!data[1].length) {
           throw new error('未查询到该文章')
         }
+        data[1][0].comments = data[2]
         return data[1][0]
       } catch (err) {
         log.error('更新', err.message)
       }
     }).catch(err => {
       log.error('查询文章或更新pv错误', JSON.stringify(err))
+    })
+    articleData.comments.forEach((comment, index) => {
+      comment.countdown = countdown(comment.create_time)
     })
     return ctx.render('article', {
       article: Object.assign({}, articleData, {
@@ -100,7 +108,7 @@ router
     }
 
     articles.forEach((article) => {
-      Object.assign(article, {countdown: countdown(article.update_time)})
+      Object.assign(article, {countdown: countdown(article.update_time, '更新于 ')})
       if (article.type === '1') {
         staticties.articleType1 ++
       } else if (article.type === '2') {
@@ -127,15 +135,22 @@ router
     })
     return ctx.render('editArticle', {article: articleData})
   })
-  .post('/:articleId/edit', async ctx => {
-    let allowUpdate = await articleModel.findArticleById(ctx.params.articleId).then(data => {
+  .post('/:articleId/edit', checkLogin, async ctx => {
+    let article = await articleModel.findArticleById(ctx.params.articleId).then(data => {
       if (data.length) {
-        return data[0].author === ctx.session.userInfo.sourceId
+        return data[0]
       } else {
         return false
       }
     })
-    if (!allowUpdate) {
+    if (!article) {
+      return ctx.body = {
+        code: -1,
+        data: {},
+        msg: '此文章不存在'
+      }
+    }
+    if (article.author !== ctx.session.userInfo.sourceId) {
       ctx.body = {
         code: -1,
         data: {},
@@ -160,9 +175,12 @@ router
         }
       }
       let time = moment().format('YYYY-MM-DD HH:mm:ss')
-      let picture = await saveBase64(ctx.request.body.picture).then(imgName => {
-        return imgName
-      })
+      let picture = ctx.request.body.picture.replace(/\/img\//, '')
+      if (picture !== article.picture) {
+        picture = await saveBase64(ctx.request.body.picture).then(imgName => {
+          return imgName
+        })
+      }
       let update = await articleModel.updateArticleById(ctx.params.articleId, [
         ctx.request.body.title,
         ctx.request.body.tag || null,
@@ -183,15 +201,30 @@ router
       }
     }
   })
-  .get('/:articleId/delete', async ctx => {
+  .get('/:articleId/delete', checkLogin, async ctx => {
     try {
-      let verifyUser = await articleModel.findArticleById(articleId).then(user => {
+      let verifyUser = await articleModel.findArticleById(ctx.params.articleId).then(user => {
         if (user.length) {
           return user[0]
         } else {
           throw new error('未找到该文章')
         }
       })
+      if (verifyUser.author === ctx.session.userInfo.sourceId) {
+        let deleteStep = await articleModel.deleteArticleById(ctx.params.articleId).then(data => {
+          return data
+        }).catch(err => {
+          log.error('删除文章失败', JSON.stringify(err))
+          throw new error(`删除文章失败${JSON.stringify(err)}`)
+        })
+        ctx.body = {
+          code: 1,
+          data: {},
+          msg: '删除成功'
+        }
+      } else {
+        throw new error('你没有权限删除此文章')
+      }
     } catch (e) {
       ctx.body = {
         code: -1,

@@ -47,6 +47,7 @@
     <% } %>
   </div>
   <div class="extra content">
+    <% if (target && target === 'index') { %>
     <div class="left floated">
       <a class="ui image label" style="display: flex; align-items: center">
         <% if (articles[i].source === 'native') { %>
@@ -61,13 +62,14 @@
         <% } %>
       </a>
     </div>
+    <% } %>
     <div class="right floated">
       <% if (app.session.userInfo && articles[i].author === app.session.userInfo.sourceId) { %>
       <a href="/article/<%= articles[i].id %>/edit" class="ui label">
         <i class="edit icon"></i>
         编辑
       </a>
-      <a class="ui label">
+      <a data-id="<%= articles[i].id %>" data-title="<%= articles[i].title %>" class="ui label remove-btn">
         <i class="remove icon"></i>
         删除
       </a>
@@ -79,10 +81,48 @@
   </div>
 </div>
 <% } %>
+<div class="delete-warn ui small basic test modal">
+  <i class="close icon"></i>
+  <div class="header">
+    确认删除文章
+  </div>
+  <div class="image content">
+    <div class="description">
+
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui button">取消</div>
+    <div class="ui button positive" style="background-color: #db2828">确认</div>
+  </div>
+</div>
 <% if (app.session.userInfo) { %>
 <script type="text/javascript">
-  $('.article-list .remove').click(function () {
+  $('.article-list .remove-btn').click(function () {
+    var title = $(this).attr('data-title'),
+        articleId = $(this).attr('data-id')
 
+    $('.delete-warn.ui.modal').modal({
+      onShow () {
+        $(this).find('.description').text(title)
+      },
+      onApprove() {
+        $.ajax({
+          type: 'get',
+          url: '/article/' + articleId + '/delete',
+          data: {},
+          success (res) {
+            if (res.code === 1) {
+              $('<div>' + res.msg + '</div>').toast(3000, function () {
+                location.reload()
+              })
+            } else {
+              $('<div>' + res.msg + '</div>').toast(3000)
+            }
+          }
+        })
+      }
+    }).modal('show')
   })
 </script>
 <% } %>

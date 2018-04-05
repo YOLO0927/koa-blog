@@ -1,4 +1,5 @@
 .DS_Store
 node_modules/
+config/default.js
 log/*
-static/img/*
+static/img/*.png
