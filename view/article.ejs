@@ -76,9 +76,22 @@
         <div class="text">
           <%= comment.content %>
         </div>
+        <% if (app.session.userInfo) { %>
         <div class="actions">
-          <a class="reply">Reply</a>
+          <a class="reply">回复</a>
         </div>
+        <form style="display: none;" class="ui reply form">
+          <div class="field">
+            <textarea></textarea>
+          </div>
+          <div class="ui submit labeled icon button cancel-reply-btn">
+            <i class="icon edit"></i>取消
+          </div>
+          <div data-id="<%= comment.id %>" class="ui green submit labeled icon button add-reply-btn">
+            <i class="icon edit"></i>添加回复
+          </div>
+        </form>
+        <% } %>
       </div>
     </div>
     <% }) %>
@@ -87,6 +100,7 @@
 </div>
 <% if (app.session.userInfo) { %>
 <script type="text/javascript">
+  // 提交评论
   $('.submit-comment-btn').click(function () {
     $.ajax({
       url: '/comment',
@@ -101,6 +115,35 @@
             location.reload()
           })
         }
+      }
+    })
+  })
+  // 回复评论
+  $('.reply').click(function (e) {
+    $(e.target).parent().next('form').fadeIn()
+  })
+
+  $('.cancel-reply-btn').click(function (e) {
+    console.log($(e.target).parents('form'))
+    $(e.target).parents('form').fadeOut()
+  })
+
+  $('.add-reply-btn').click(function (e) {
+    var commentId = $(e.target)[0].nodeName === 'I' ? $(e.target).parents('.add-reply-btn').attr('data-id') : $(e.target).attr('data-id')
+    console.log(commentId)
+    console.log($(e.target).parents('.add-reply-btn').prevAll('.field').find('textarea').val())
+    var content = $(e.target)[0].nodeName === 'I' ? $(e.target).parents('.add-reply-btn').prevAll('.field').find('textarea').val() : $(e.target).prevAll('.field').find('textarea').val()
+    $.ajax({
+      url: '/comment/reply',
+      type: 'post',
+      data: {
+        articleId: '<%= article.id %>',
+        author: '<%= app.session.userInfo.sourceId %>',
+        commentId: commentId,
+        content:content
+      },
+      success (res) {
+        console.log(res)
       }
     })
   })

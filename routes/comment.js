@@ -1,6 +1,7 @@
 var moment = require('moment')
 var Router = require('koa-router')
 var commentModel = require('../model/comments')
+var replyModel = require('../model/replys')
 var checkLogin = require('../middlewares/checkLogin.js')
 var log = new require('../public/log.js')()
 
@@ -31,5 +32,27 @@ router
       }
     }
   })
-
+  .post('/reply', checkLogin, async ctx => {
+    let time = moment().format('YYYY-MM-DD HH-mm')
+    let addReply = await replyModel.addReply([
+      ctx.request.body.author,
+      parseInt(ctx.request.body.articleId),
+      parseInt(ctx.request.body.commentId),
+      ctx.request.body.content,
+      time,
+      time
+    ]).then(data => {
+      console.log(data)
+      return data ? data : false
+    }).catch(err => {
+      log.error('评论回复失败', JSON.stringify(err))
+      return false
+    })
+    console.log(addReply)
+    return ctx.body = {
+      code: addReply ? 1 : -1,
+      data: {},
+      msg: addReply ? '评论回复成功' : '评论回复失败'
+    }
+  })
 module.exports = router.routes()
