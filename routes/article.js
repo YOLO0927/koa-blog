@@ -3,6 +3,7 @@ var Router = require('koa-router')
 var md = require('markdown-it')()
 var articleModel = require('../model/articles')
 var commentModel = require('../model/comments')
+var replyModel = require('../model/replys')
 var saveBase64 = require('../public/saveBase64').save
 var log = new require('../public/log.js')()
 var countdown = require('../public/countdown.js').countdown
@@ -67,11 +68,24 @@ router
     let articleData = await Promise.all([
       articleModel.updatePv(ctx.params.articleId),
       articleModel.findArticleById(ctx.params.articleId),
-      commentModel.findComments(ctx.params.articleId)
+      commentModel.findComments(ctx.params.articleId),
+      replyModel.findReplyByArticleId(ctx.params.articleId)
     ]).then(data => {
       try {
         if (!data[1].length) {
           throw new error('未查询到该文章')
+        }
+        if (data[3].length) {
+          data[2].forEach((comment) => {
+            comment.replys = []
+            data[3].forEach((reply) => {
+              if (reply.comment_id === comment.id) {
+                comment.replys.push(Object.assign(reply, {
+                  create_time: countdown(reply.create_time)
+                }))
+              }
+            })
+          })
         }
         data[1][0].comments = data[2]
         return data[1][0]

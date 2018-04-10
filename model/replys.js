@@ -31,7 +31,7 @@ let addReply = (values) => {
 
 let findReplyByArticleId = (articleId) => {
   let sql = `SELECT
-            	users.* replys.*
+            	users.*, replys.*
             FROM
             	replys
             	INNER JOIN users ON users.sourceId = replys.author
