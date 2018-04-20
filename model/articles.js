@@ -55,20 +55,47 @@ let findArticleById = (id) => {
 }
 
 let findArticlesByAuthor = (author) => {
-  let sql = `select *
-             from articles
-             where author = '${author}'
-             order by articles.update_time desc`
+  let sql = `SELECT
+          	articles.id,
+          	articles.tag,
+          	articles.abstract,
+          	articles.title,
+          	articles.content,
+          	articles.type,
+          	articles.author,
+          	articles.picture,
+          	articles.pv,
+          	articles.create_time,
+          	articles.update_time,
+          	Count( likes.id ) AS likes
+          FROM
+          	articles
+          	LEFT JOIN likes ON articles.id = likes.article_id
+          WHERE
+          	articles.author = '${author}'
+          GROUP BY(articles.id)
+          ORDER BY
+          	articles.update_time DESC`
   return connect.query(sql, [])
 }
 
 let findArticlesList = (startRow, rowCount) => {
-  let sql = `select users.username, users.avatar, users.source ,users.sign, articles.*
-             from articles
-             inner join users
-             on articles.author = users.sourceId
-             order by articles.update_time desc
-             limit ${startRow}, ${rowCount}`
+  let sql = `SELECT
+            	users.username,
+            	users.avatar,
+            	users.source,
+            	users.sign,
+            	articles.*,
+            	Count(likes.id) as likes
+            FROM
+            	articles
+            	INNER JOIN users ON articles.author = users.sourceId
+            	left JOIN likes ON articles.id = likes.article_id
+            GROUP BY
+            	( articles.id )
+            ORDER BY
+            	articles.update_time DESC
+            LIMIT ${startRow}, ${rowCount}`
   return connect.query(sql, [])
 }
 

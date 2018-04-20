@@ -74,7 +74,10 @@
         删除
       </a>
       <% } %>
-      <span data-tooltip="本文浏览量: <%= articles[i].pv %>" data-inverted="">
+      <span data-tooltip="本文点赞数: <%= articles[i].likes %>">
+        <i style="color: #21ba45" class="heart icon"></i> <%= articles[i].likes %>
+      </span>
+      <span style="margin: 0 0.5em;" data-tooltip="本文浏览量: <%= articles[i].pv %>">
         <i class="eye icon"></i> <%= articles[i].pv %>
       </span>
     </div>

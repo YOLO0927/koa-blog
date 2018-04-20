@@ -97,6 +97,15 @@ a:hover {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+.article .add-heart:hover{
+  cursor: pointer;
+}
+.article .remove-heart{
+  color: #21ba45;
+}
+.article .remove-heart:hover{
+  cursor: pointer;
+}
 .article > .user-info .avatar-box > img{
   width: 3em;
   border-radius: 50%;

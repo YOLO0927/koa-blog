@@ -5,4 +5,5 @@ module.exports = function (app) {
   app.use(require('./updateUser.js'))
   app.use(require('./article.js'))
   app.use(require('./comment.js'))
+  app.use(require('./like.js'))
 }

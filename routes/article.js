@@ -4,6 +4,7 @@ var md = require('markdown-it')()
 var articleModel = require('../model/articles')
 var commentModel = require('../model/comments')
 var replyModel = require('../model/replys')
+var likeModel = require('../model/likes')
 var saveBase64 = require('../public/saveBase64').save
 var log = new require('../public/log.js')()
 var countdown = require('../public/countdown.js').countdown
@@ -69,7 +70,9 @@ router
       articleModel.updatePv(ctx.params.articleId),
       articleModel.findArticleById(ctx.params.articleId),
       commentModel.findComments(ctx.params.articleId),
-      replyModel.findReplyByArticleId(ctx.params.articleId)
+      replyModel.findReplyByArticleId(ctx.params.articleId),
+      likeModel.findUserByArticleId(ctx.params.articleId),
+      likeModel.findCountByArticleId(ctx.params.articleId)
     ]).then(data => {
       try {
         if (!data[1].length) {
@@ -87,7 +90,13 @@ router
             })
           })
         }
-        data[1][0].comments = data[2]
+        // 评论内容
+        data[1][0].comments = data[2] || []
+        // 判断用户是点赞还是去掉点赞
+        data[1][0].allowLike = !data[4].length ? true : false
+        // 当前文章总点赞数
+        data[1][0].likes = data[5][0].likes
+
         return data[1][0]
       } catch (err) {
         log.error('更新', err.message)
@@ -95,6 +104,15 @@ router
     }).catch(err => {
       log.error('查询文章或更新pv错误', JSON.stringify(err))
     })
+
+    // 当用户处于已登录状态时，判断用户是否已为这篇文章点赞
+    if (ctx.session.userInfo) {
+      let find = await likeModel.findLikeByAuthor(ctx.session.userInfo.sourceId, ctx.params.articleId).then(data => {
+        return data.length ? false : true
+      })
+      articleData.allowLike = find
+    }
+
     articleData.comments.forEach((comment, index) => {
       comment.countdown = countdown(comment.create_time)
     })
@@ -118,7 +136,8 @@ router
       articleType2: 0,
       articleType3: 0,
       pvCount: 0,
-      articleCount: articles.length
+      articleCount: articles.length,
+      likeCount: 0
     }
 
     articles.forEach((article) => {
@@ -131,6 +150,7 @@ router
         staticties.articleType3 ++
       }
       staticties.pvCount += article.pv
+      staticties.likeCount += article.likes
     })
     return ctx.render('person', {
       articles,

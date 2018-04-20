@@ -42,13 +42,11 @@ router
       time,
       time
     ]).then(data => {
-      console.log(data)
       return data ? data : false
     }).catch(err => {
       log.error('评论回复失败', JSON.stringify(err))
       return false
     })
-    console.log(addReply)
     return ctx.body = {
       code: addReply ? 1 : -1,
       data: {},

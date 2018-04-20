@@ -37,7 +37,8 @@ let findComments = (articleId) => {
         	comments
         	INNER JOIN users ON users.sourceId = comments.author
         WHERE
-        	article_id = 9`
+        	article_id = ${articleId}
+          order by comments.create_time desc`
   return connect.query(sql, [])
 }
 

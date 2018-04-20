@@ -19,8 +19,16 @@
       <p class="sign"><%= article.sign %></p>
     </div>
     <div style="color: rgba(0,0,0,.4);">
-      <span data-tooltip="本文浏览量" data-inverted="">
+      <span data-tooltip="本文浏览量">
         <i class="eye icon"></i> <%= article.pv %>
+      </span>
+      <span style="display: block;" data-tooltip="被喜欢数" data-position="bottom center">
+        <% if (article.allowLike) { %>
+        <i id="heart" class="heart outline icon add-heart"></i>
+        <% } else { %>
+        <i id="heart" class="heart icon remove-heart"></i>
+        <% } %>
+        <span><%= article.likes %></span>
       </span>
     </div>
   </div>
@@ -58,6 +66,7 @@
     <% } %>
   </div>
   <% if (article.comments.length) { %>
+  <!-- 评论 -->
   <div class="ui comments" style="padding-bottom: 3em;">
     <% article.comments.forEach(function (comment, index) { %>
     <div class="comment">
@@ -93,7 +102,8 @@
         </form>
         <% } %>
       </div>
-      <% if(comment.replys.length) { %>
+      <% if(comment.replys) { %>
+      <!-- 评论回复 -->
       <% comment.replys.forEach(function (reply) { %>
         <div class="comments">
           <div class="comment">
@@ -194,4 +204,42 @@
   })
 </script>
 <% } %>
+<script type="text/javascript">
+  // 点赞
+  $('#heart').click(function () {
+    if ($(this).hasClass('add-heart')) {
+      $.ajax({
+        url: '/like/add',
+        type: 'get',
+        data: {
+          articleId: '<%= article.id %>'
+        },
+        success (res) {
+          console.log(this)
+          $('<div>' + res.msg + '</div>').toast(2000)
+          if (res.code === 1) {
+            $('#heart').next('span').text(res.data.count)
+            $('#heart').addClass('remove-heart').removeClass('add-heart').removeClass('outline')
+          }
+        }
+      })
+    } else if ($(this).hasClass('remove-heart')) {
+      $.ajax({
+        url: '/like/delete',
+        type: 'get',
+        data: {
+          articleId: '<%= article.id %>'
+        },
+        success (res) {
+          console.log(this)
+          $('<div>' + res.msg + '</div>').toast(2000)
+          if (res.code === 1) {
+            $('#heart').next('span').text(res.data.count)
+            $('#heart').addClass('add-heart').addClass('outline').removeClass('remove-heart')
+          }
+        }
+      })
+    }
+  })
+</script>
 <%- include('footer') %>
