@@ -2,7 +2,7 @@
   "name": "blog",
   "version": "1.0.0",
   "description": "understanding the node modules and read source code for study node",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "dev": "supervisor --harmony main",
     "test": "echo \"Error: no test specified\" && exit 1"
