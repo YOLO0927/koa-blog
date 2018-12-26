@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const Koa = require('Koa')
+const Koa = require('koa')
 const compose = require('koa-compose')
 const views = require('koa-views')
 const session = require('koa-session')
